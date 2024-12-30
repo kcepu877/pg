@@ -1151,37 +1151,49 @@ function uuidv4() {
 
   // Fungsi untuk mengecek status proxy
   function checkProxyStatus(ip, port, statusElement) {
-    statusElement.innerHTML = '<div class="loading-icon"></div>';
+  statusElement.innerHTML = '<div class="loading-icon"></div>';
 
-    const startTime = performance.now();
-    const Status = `https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=${ip}&host=speed.cloudflare.com&port=${port}&tls=true`;
-    
-    fetch(Status)
-      .then(response => response.json())
-      .then(data => {
-        const endTime = performance.now();
-        const latency = (endTime - startTime).toFixed(2); // Menghitung latency
+  const startTime = performance.now();
+  const Status = `https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=${ip}&host=speed.cloudflare.com&port=${port}&tls=true`;
 
-        // Menampilkan status proxy dan latency
-        if (data.proxyStatus === "ACTIVE") {
-          statusElement.innerHTML = `
-          <span class="check-icon">&#10004;</span> (${latency} ms)
+  fetch(Status)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      const endTime = performance.now();
+      const latency = (endTime - startTime).toFixed(2); // Menghitung latency
+
+      // Menampilkan status proxy dan latency
+      if (data.proxyStatus === "ACTIVE") {
+        statusElement.innerHTML = `
+          <span class="check-icon">&#10004;</span> Active (${latency} ms)
         `;
-          statusElement.style.color = 'green';
-          } else if (data.proxyStatus === "DEAD") {
-          statusElement.innerHTML = `
+        statusElement.style.color = 'green';
+      } else if (data.proxyStatus === "DEAD") {
+        statusElement.innerHTML = `
           <span class="error-icon">&#10006;</span> Dead
         `;
-          statusElement.style.color = 'red';
-          }
-      })
-      .catch(() => {
+        statusElement.style.color = 'red';
+      } else {
         statusElement.innerHTML = `
+          <span class="warning-icon">?</span> Unknown
+        `;
+        statusElement.style.color = 'orange';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      statusElement.innerHTML = `
         <span class="error-icon">&#10006;</span> Error
       `;
-        statusElement.style.color = 'cyan';
-      });
-  }
+      statusElement.style.color = 'cyan';
+    });
+}
+
 
   // Fungsi untuk render proxies dengan pagination
   function renderProxies(proxies, proxyList, pagination, itemsPerPage) {
