@@ -1151,23 +1151,27 @@ function uuidv4() {
 
   // Fungsi untuk mengecek status proxy
   function checkProxyStatus(ip, port, statusElement) {
+  console.log('Function called with:', { ip, port, statusElement });
   statusElement.innerHTML = '<div class="loading-icon"></div>';
 
   const startTime = performance.now();
   const Status = `https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=${ip}&host=speed.cloudflare.com&port=${port}&tls=true`;
 
+  console.log('Request URL:', Status);
+
   fetch(Status)
     .then(response => {
+      console.log('Response received:', response);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       return response.json();
     })
     .then(data => {
+      console.log('Data received:', data);
       const endTime = performance.now();
-      const latency = (endTime - startTime).toFixed(2); // Menghitung latency
+      const latency = (endTime - startTime).toFixed(2);
 
-      // Menampilkan status proxy dan latency
       if (data.proxyStatus === "ACTIVE") {
         statusElement.innerHTML = `
           <span class="check-icon">&#10004;</span> Active (${latency} ms)
